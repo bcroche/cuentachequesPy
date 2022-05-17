@@ -13,7 +13,7 @@ class ChequesSolver:
 
     def __init__(self, cheques):
         self.cheques = cheques
-        print("Tipos de cheques: ", self.cheques)        
+        #print("Tipos de cheques: ", self.cheques)        
 
 
     def peso(self, mochila):
@@ -30,10 +30,12 @@ class ChequesSolver:
 
     def calculaRec(self, cantidad, nivel, mochila, mochilaCand):
         if nivel == self.niveles:
-            print ("Caso base", mochilaCand)
+            #print ("Caso base", mochilaCand)
             
             pCand= self.peso(mochilaCand)
             pMochila= self.peso(mochila)
+            if pCand > cantidad:
+                return mochila
             if pCand > pMochila:
                 #mochila= mochilaCand
                 return mochilaCand
@@ -46,13 +48,13 @@ class ChequesSolver:
                         return mochilaCand
             return mochila
         else:
-            print ("Caso recursivo")
+            #print ("Caso recursivo")
             pesoCand = self.peso(mochilaCand)
-            maxCheques= int((cantidad - pesoCand) / self.cheques[nivel][0])
+            maxCheques= int((cantidad - pesoCand) / self.cheques[nivel]) 
             temp = mochilaCand.copy()
             for i in range(maxCheques+1):
                 #reset(nivel, mochilaCand)                                
-                mochilaCand.append((i, self.cheques[nivel][0]))
+                mochilaCand.append((i, self.cheques[nivel]))
                 mochila = self.calculaRec(cantidad, nivel + 1, mochila, mochilaCand)
                 mochilaCand= temp.copy()
         return mochila
@@ -80,14 +82,29 @@ class ChequesSolver:
 
 print("Hola")
 tipos = [
-    (8,10),
-    (3,10),
-    (2,10)
+    (8),
+    (3),
+    (7)
 ]
 cs =  ChequesSolver(tipos)
 #print (cs.peso([(10,8),  (3, 3) ,(0, 2)]))
-res= cs.calcula(58)
-print (res)
+cantidad= 58
+res= cs.calcula(cantidad)
+print (cantidad,cs.peso(res), ": ", res)
+
+
+cantidad= 8
+res= cs.calcula(cantidad)
+print (cantidad,cs.peso(res), ": ", res)
+
+
+cantidad= 12
+res= cs.calcula(cantidad)
+print (cantidad,cs.peso(res), ": ", res)
+
+cantidad= 13
+res= cs.calcula(cantidad)
+print (cantidad,cs.peso(res), ": ", res)
 
 
 
