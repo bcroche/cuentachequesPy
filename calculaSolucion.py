@@ -1,7 +1,26 @@
 
 
+class Mochila:
+    elementos = []
+    numero_cheques = 0
+    valor_actual = 0
 
-from tabnanny import check
+    def add(self, numCheques,valorCheque):
+        self.elementos.append((numCheques, valorCheque))
+        self.numero_cheques += numCheques
+        self.valor_actual += numCheques*valorCheque
+    def peso(self):
+        return self.valor_actual
+    def cheques(self):
+        return self.numero_cheques
+    def copy(self):
+        newM = Mochila()
+        newM.elementos= self.elementos.copy()
+        newM.numero_cheques= self.numero_cheques
+        newM.valor_actual = self.valor_actual
+        return newM
+
+
 
 def reset(n, lista):
         for e in range(n, len(lista)):
@@ -10,30 +29,34 @@ def reset(n, lista):
 class ChequesSolver:
     cheques = 0
     niveles= 0
+    soluciones_analizadas = 0
 
     def __init__(self, cheques):
         self.cheques = cheques
+        self.cheques.sort()
         #print("Tipos de cheques: ", self.cheques)        
 
 
-    def peso(self, mochila):
+    def pesoOLD(self, mochila):
         peso=0
         for elem in mochila:
             peso += elem[0] * elem [1]
         return peso
 
-    def papeles(self, mochila):
+    def papelesOLD(self, mochila):
         papeles=0
         for elem in mochila:
             papeles += elem[0]
         return papeles
 
-    def calculaRec(self, cantidad, nivel, mochila, mochilaCand):
+    def calculaRec(self, cantidad, nivel, mochila: Mochila, mochilaCand: Mochila):
         if nivel == self.niveles:
             #print ("Caso base", mochilaCand)
+            self.soluciones_analizadas= self.soluciones_analizadas + 1
+
             
-            pCand= self.peso(mochilaCand)
-            pMochila= self.peso(mochila)
+            pCand= mochilaCand.peso()
+            pMochila= mochila.peso()
             if pCand > cantidad:
                 return mochila
             if pCand > pMochila:
@@ -41,21 +64,22 @@ class ChequesSolver:
                 return mochilaCand
             else:
                 if pCand == pMochila:
-                    nCand= self.papeles(mochilaCand)
-                    nMochila= self.papeles(mochila)
+                    nCand= mochilaCand.cheques()
+                    nMochila= mochila.cheques()
                     if nCand < nMochila:
                         #mochila= mochilaCand
                         return mochilaCand
             return mochila
         else:
             #print ("Caso recursivo")
-            pesoCand = self.peso(mochilaCand)
+            
+            pesoCand = mochilaCand.peso()
             maxCheques= int((cantidad - pesoCand) / self.cheques[nivel]) 
             temp = mochilaCand.copy()
             for i in range(maxCheques+1):
                 #reset(nivel, mochilaCand)                                
-                mochilaCand.append((i, self.cheques[nivel]))
-                mochila = self.calculaRec(cantidad, nivel + 1, mochila, mochilaCand)
+                mochilaCand.add(i, self.cheques[nivel])
+                mochila = self.calculaRec(cantidad, nivel + 1, mochila, mochilaCand)                
                 mochilaCand= temp.copy()
         return mochila
 
@@ -64,8 +88,8 @@ class ChequesSolver:
     
 
     def calcula(self,cantidad):
-        mochila= []
-        mochilaCand = []
+        mochila= Mochila()
+        mochilaCand = Mochila()
         self.niveles= len(self.cheques)
         mochila= self.calculaRec(cantidad, 0, mochila, mochilaCand)
         return mochila
